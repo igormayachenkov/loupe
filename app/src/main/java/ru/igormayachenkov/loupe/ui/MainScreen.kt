@@ -17,7 +17,7 @@ fun MainScreen(){
     val cameraPermissionState: PermissionState = rememberPermissionState(android.Manifest.permission.CAMERA)
 
     if(cameraPermissionState.status.isGranted){
-        Text(text = "granted")
+        CameraScreen()
     }else{
         Column {
             Text(text = "The camera permissions are not granted")
