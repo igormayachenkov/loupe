@@ -10,32 +10,34 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary         = Color(0xFF101F7F),
+    secondary       = Color(0xFF03DAC5),
+    tertiary        = Pink80,
+    background      = Color.Black,
+    surface         = Color(0xFF333333),
+    onPrimary       = Color.White,
+    onSurface       = Color.White,
+    error           = Color.Yellow//(0xFFCF6679),
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    primary         = Color(0xFF3F51B5),
+    secondary       = Color(0xFF03DAC5),
+    tertiary        = Pink40,
+    background      = Color(0xFFE0E0E0),
+    surface         = Color.White,
+    onPrimary       = Color.White,
+    onSurface       = Color.Black,
+    error           = Color(0xFFB00020)
 )
+
 
 @Composable
 fun LoupeTheme(
