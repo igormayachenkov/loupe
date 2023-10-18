@@ -21,5 +21,8 @@ class MainViewModel : ViewModel() {
     fun setImage(image:Bitmap){
         _imageFlow.value = image
     }
+    fun clearImage(){
+        _imageFlow.value = null
+    }
 
 }

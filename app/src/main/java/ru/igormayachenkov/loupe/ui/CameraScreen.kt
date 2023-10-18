@@ -2,6 +2,7 @@ package ru.igormayachenkov.loupe.ui
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.util.Log
 import android.view.ViewGroup
 import android.widget.LinearLayout
@@ -77,7 +78,9 @@ private fun capturePhoto(
 
     cameraController.takePicture(mainExecutor, object : ImageCapture.OnImageCapturedCallback() {
         override fun onCaptureSuccess(image: ImageProxy) {
-            val bitmap: Bitmap = image.toBitmap()
+            val bitmap: Bitmap = image
+                .toBitmap()
+                .rotateBitmap(image.imageInfo.rotationDegrees)
             onPhotoCaptured(bitmap)
             image.close()
         }
@@ -86,4 +89,16 @@ private fun capturePhoto(
             Log.e(TAG, "Error capturing image", exception)
         }
     })
+}
+
+/**
+ * The rotationDegrees parameter is the rotation in degrees clockwise from the original orientation.
+ */
+fun Bitmap.rotateBitmap(rotationDegrees: Int): Bitmap {
+    val matrix = Matrix().apply {
+        postRotate(-rotationDegrees.toFloat())
+        postScale(-1f, -1f)
+    }
+
+    return Bitmap.createBitmap(this, 0, 0, width, height, matrix, true)
 }
