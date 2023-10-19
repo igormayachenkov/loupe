@@ -1,7 +1,11 @@
 package ru.igormayachenkov.loupe.ui
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.scale
@@ -82,9 +87,10 @@ fun ImageScreen(
         Text(text = "canvas ${canvas.width.roundToInt()}x${canvas.height.roundToInt()}", color = Color.Yellow)
         Text(text = "target ${target.x.roundToInt()}x${target.y.roundToInt()}", color = Color.Yellow)
         // TOOLBAR
+        val context = LocalContext.current
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
             Button(onClick = viewModel::clearImage) { Text("Clear") }
-            Button(onClick = viewModel::share) { Text("Share") }
+            Button(onClick = {copyToClipboard(target,context)} ) { Text("Share") }
         }
         //ScreenSize()
     }
@@ -101,7 +107,16 @@ fun ImageScreen(
 
     // PREVIEW
     PreviewScreen(image,target)
+}
 
+private fun copyToClipboard(target:Offset, context: Context){
+    // Copy to clipboard
+    (context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?)?.let{
+        val clip = ClipData.newPlainText("Target position","${target.x.roundToInt()}x${target.y.roundToInt()}")
+        it.setPrimaryClip(clip)
+    }
+    // Show Info
+    Toast.makeText(context, "The target position is copied to the clipboard", Toast.LENGTH_SHORT).show()
 }
 
 
