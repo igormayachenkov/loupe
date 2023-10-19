@@ -3,7 +3,6 @@ package ru.igormayachenkov.loupe.ui
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,6 +34,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.scale
+import ru.igormayachenkov.loupe.size
 import kotlin.math.roundToInt
 
 private const val TAG = "myapp.ImageScreen"
@@ -89,7 +89,7 @@ fun ImageScreen(
         Button(onClick = viewModel::clearImage) {
             Text("Clear")
         }
-        ScreenSize()
+        //ScreenSize()
     }
 
     // TARGET
@@ -102,28 +102,27 @@ fun ImageScreen(
         }
     )
 
+    // PREVIEW
+    PreviewScreen(image,target)
+
 }
-
-val Bitmap.size:Size
-    get()=Size(width.toFloat(),height.toFloat())
-
-const val TARGET_ICON_SIZE_DP = 50 // semi size
 
 @Composable
 private fun DraggableTarget(
     target: Offset,
     onDrag:(Offset)->Unit
 ) {
-    val pxSize = LocalDensity.current.run { TARGET_ICON_SIZE_DP.dp.toPx() }
+    val pxSize = LocalDensity.current.run { TARGET_SEMISIZE_DP.dp.toPx() }
+    val pxHole = LocalDensity.current.run { TARGET_HOLE_DP.dp.toPx() }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Canvas(
             Modifier
                 .offset {
-                    IntOffset((target.x-pxSize).roundToInt(), (target.y-pxSize).roundToInt())
+                    IntOffset((target.x - pxSize).roundToInt(), (target.y - pxSize).roundToInt())
                 }
                 //.background(Color.Blue)
-                .size((2*TARGET_ICON_SIZE_DP).dp)
+                .size((2 * TARGET_SEMISIZE_DP).dp)
                 .pointerInput(Unit) {
                     detectDragGestures { change, dragAmount ->
                         change.consume()
@@ -132,24 +131,22 @@ private fun DraggableTarget(
                 }
         ){
             // DRAW TARGET
-            val color = Color.Red
-            val width = 10f
             drawCircle(
-                color = color,
+                color = TARGET_COLOR,
                 radius = 100f,
                 center = center,
-                style = Stroke(width = width)
+                style = Stroke(width = TARGET_LINE_WIDTH)
             )
             drawCircle(
-                color = color,
+                color = TARGET_COLOR,
                 radius = 50f,
                 center = center,
-                style = Stroke(width = width)
+                style = Stroke(width = TARGET_LINE_WIDTH)
             )
-            drawLine(color, Offset(center.x-10, center.y), Offset(0f, center.y), width)
-            drawLine(color, Offset(center.x+10, center.y), Offset(size.width, center.y), width)
-            drawLine(color, Offset(center.x, center.y-10), Offset(center.x,0f), width)
-            drawLine(color, Offset(center.x, center.y+10), Offset(center.x,size.height), width)
+            drawLine(TARGET_COLOR, Offset(center.x-pxHole, center.y), Offset(0f, center.y), TARGET_LINE_WIDTH)
+            drawLine(TARGET_COLOR, Offset(center.x+pxHole, center.y), Offset(size.width, center.y), TARGET_LINE_WIDTH)
+            drawLine(TARGET_COLOR, Offset(center.x, center.y-pxHole), Offset(center.x,0f), TARGET_LINE_WIDTH)
+            drawLine(TARGET_COLOR, Offset(center.x, center.y+pxHole), Offset(center.x,size.height), TARGET_LINE_WIDTH)
         }
     }
 }
@@ -168,27 +165,3 @@ fun ScreenSize() {
     Text(text = "widthInPx = $widthInPx, heightInPx = $heightInPx")
 }
 
-
-private fun drawTarget(drawScope: DrawScope, x:Float, y:Float){
-    val color = Color.Red
-    val width = 10f
-    val center = Offset(x,y)
-    drawScope.apply {
-        drawCircle(
-            color = color,
-            radius = 100f,
-            center = center,
-            style = Stroke(width = width)
-        )
-        drawCircle(
-            color = color,
-            radius = 50f,
-            center = center,
-            style = Stroke(width = width)
-        )
-        drawLine(color, Offset(x+10, y), Offset(x+150, y), width)
-        drawLine(color, Offset(x-10, y), Offset(x-150, y), width)
-        drawLine(color, Offset(x, y+10), Offset(x, y+150), width)
-        drawLine(color, Offset(x, y-10), Offset(x, y-150), width)
-    }
-}

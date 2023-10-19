@@ -10,13 +10,10 @@ import kotlinx.coroutines.flow.asStateFlow
 
 private const val TAG = "myapp.ViewModel"
 
-
 class MainViewModel : ViewModel() {
 
-    init { Log.d(TAG, "init") }
-
-
-    // IMAGE
+    //----------------------------------------------------------------------------------------------
+    // IMAGE BITMAP
     private val _imageFlow:MutableStateFlow<Bitmap?> = MutableStateFlow(null)
     val imageFlow:StateFlow<Bitmap?> = _imageFlow.asStateFlow()
 
@@ -28,16 +25,29 @@ class MainViewModel : ViewModel() {
         _imageFlow.value = null
     }
 
-    // TARGET
+    //----------------------------------------------------------------------------------------------
+    // TARGET POSITION
     private val _targetFlow:MutableStateFlow<Offset> = MutableStateFlow(Offset(0f,0f))
     val targetFlow:StateFlow<Offset> = _targetFlow.asStateFlow()
 
-    fun setTargetPosition(targetPosition:Offset){
+    private fun setTargetPosition(targetPosition:Offset){
         _targetFlow.value = targetPosition
     }
+
     fun moveTargetPosition(move:Offset){
         val value = _targetFlow.value
-        _targetFlow.value = Offset(value.x+move.x, value.y+move.y)
+        // New value
+        var x = value.x+move.x
+        var y = value.y+move.y
+        // Check borders
+        if(x<0) x=0f
+        if(y<0) y=0f
+        _imageFlow.value?.let {
+            if(x>it.width)  x=it.width.toFloat()
+            if(y>it.height) y=it.height.toFloat()
+        }
+        // Update value
+        _targetFlow.value = Offset(x, y)
     }
 
 }
