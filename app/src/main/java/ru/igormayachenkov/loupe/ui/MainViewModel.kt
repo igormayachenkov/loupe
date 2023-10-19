@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlin.math.roundToInt
 
 private const val TAG = "myapp.ViewModel"
 
@@ -48,6 +49,12 @@ class MainViewModel : ViewModel() {
         }
         // Update value
         _targetFlow.value = Offset(x, y)
+    }
+
+    fun share(){
+        val value = _targetFlow.value
+        Log.w(TAG,"Target position: ${value.x.roundToInt()}x${value.y.roundToInt()}")
+
     }
 
 }
