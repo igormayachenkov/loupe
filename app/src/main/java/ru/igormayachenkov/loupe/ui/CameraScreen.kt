@@ -29,6 +29,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import ru.igormayachenkov.loupe.rotateBitmap
 import java.util.concurrent.Executor
+import kotlin.math.roundToInt
 
 private const val TAG = "myapp.CameraScreen"
 
@@ -82,11 +83,34 @@ private fun capturePhoto(
 
     cameraController.takePicture(mainExecutor, object : ImageCapture.OnImageCapturedCallback() {
         override fun onCaptureSuccess(image: ImageProxy) {
+            // image bitmap
             val bitmap: Bitmap = image
                 .toBitmap()
                 .rotateBitmap(image.imageInfo.rotationDegrees)
-            onPhotoCaptured(bitmap)
+            // Crop the bitmap according the view size
+            val crop = with(bitmap) {
+                val w = 1080f
+                val h = 2178f
+                val screenScale = w / h
+                val imageScale = width.toFloat() / height.toFloat()
+                if (screenScale < imageScale)
+                    // Fit by height
+                    Bitmap.createBitmap(
+                        this,0,0,
+                        (height * screenScale).roundToInt(),
+                        height
+                    )
+                else
+                    // Fit by width
+                    Bitmap.createBitmap(
+                        this,0,0,
+                        width,
+                        (width * screenScale).roundToInt()
+                    )
+            }
             image.close()
+            // Raise event
+            onPhotoCaptured(crop)
         }
 
         override fun onError(exception: ImageCaptureException) {
