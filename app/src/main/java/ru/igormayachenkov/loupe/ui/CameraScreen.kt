@@ -10,6 +10,7 @@ import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
@@ -33,6 +35,8 @@ import kotlin.math.roundToInt
 
 private const val TAG = "myapp.CameraScreen"
 
+private var screenSize: Size = Size(1000f,1000f)
+
 @Composable
 fun CameraScreen(
     onPhotoTaken:(Bitmap)->Unit
@@ -43,6 +47,10 @@ fun CameraScreen(
     val cameraController: LifecycleCameraController = remember { LifecycleCameraController(context) }
 
     Box(modifier = Modifier.fillMaxSize()) {
+        Canvas(modifier = Modifier.fillMaxSize()){
+            //Log.d(TAG,"screenSize $size ")
+            screenSize = size
+        }
         AndroidView(modifier = Modifier
             .fillMaxSize(),
             factory ={context ->
@@ -62,7 +70,9 @@ fun CameraScreen(
         )
     }
     Column(
-        modifier = Modifier.fillMaxSize().padding(20.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp),
         verticalArrangement = Arrangement.Bottom,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -83,21 +93,20 @@ private fun capturePhoto(
 
     cameraController.takePicture(mainExecutor, object : ImageCapture.OnImageCapturedCallback() {
         override fun onCaptureSuccess(image: ImageProxy) {
+            Log.d(TAG,"onCaptureSuccess image size:${image.width}x${image.width}  screenSize $screenSize")
             // image bitmap
             val bitmap: Bitmap = image
                 .toBitmap()
                 .rotateBitmap(image.imageInfo.rotationDegrees)
             // Crop the bitmap according the view size
             val crop = with(bitmap) {
-                val w = 1080f
-                val h = 2178f
-                val screenScale = w / h
+                val screenScale = screenSize.width / screenSize.height
                 val imageScale = width.toFloat() / height.toFloat()
                 if (screenScale < imageScale)
-                    // Fit by height
+                    // Fit by height (limited by height)
                     Bitmap.createBitmap(
                         this,0,0,
-                        (height * screenScale).roundToInt(),
+                        (if(screenScale<1) height*screenScale else height/screenScale).roundToInt(),
                         height
                     )
                 else
@@ -105,7 +114,7 @@ private fun capturePhoto(
                     Bitmap.createBitmap(
                         this,0,0,
                         width,
-                        (width * screenScale).roundToInt()
+                        (if(screenScale<1) width*screenScale else width/screenScale).roundToInt()
                     )
             }
             image.close()
