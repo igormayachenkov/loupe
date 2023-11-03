@@ -97,7 +97,14 @@ private fun capturePhoto(
             // image bitmap
             val bitmap: Bitmap = image
                 .toBitmap()
-                .rotateBitmap(image.imageInfo.rotationDegrees)
+                .rotateBitmap(image.imageInfo.rotationDegrees.let{
+                    when(it){
+                        0 -> 180
+                        90 -> 90
+                        180 -> 0
+                        else -> it
+                    }
+                })
             // Crop the bitmap according the view size
             val crop = with(bitmap) {
                 val screenScale = screenSize.width / screenSize.height

@@ -52,7 +52,7 @@ fun PreviewScreen(image: Bitmap, target: Offset){
             modifier = Modifier
                 .size((2 * PREVIEW_SEMISIZE_DP).dp)
                 .border(2.dp, Color.Black)
-                .background(Color.Green)
+                .background(Color.Black)
         ) {
             // IMAGE
             val imageBitmap: ImageBitmap =
